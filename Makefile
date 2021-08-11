@@ -3,7 +3,7 @@ install:
 	npm link
 
 publish:
-	npm publish --dru-run
+	npm publish --dry-run
 
 lint:
 	npx eslint .
