@@ -36,5 +36,5 @@ test('incorrect file2 path', () => {
   const file2 = getFixturePath('file4.json');
 
   expect(genDiff(file1, file2))
-      .toEqual(`incorrect ${file2}`);
+    .toEqual(`incorrect ${file2}`);
 });
