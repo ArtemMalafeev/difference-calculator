@@ -23,10 +23,18 @@ test('diffJSON', () => {
 }`);
 });
 
-test('incorrect file path', () => {
+test('incorrect file1 path', () => {
   const file1 = getFixturePath('file3.json');
   const file2 = getFixturePath('file2.json');
 
   expect(genDiff(file1, file2))
     .toEqual(`incorrect ${file1}`);
+});
+
+test('incorrect file2 path', () => {
+  const file1 = getFixturePath('file1.json');
+  const file2 = getFixturePath('file4.json');
+
+  expect(genDiff(file1, file2))
+      .toEqual(`incorrect ${file2}`);
 });
