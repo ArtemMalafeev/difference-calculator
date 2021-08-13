@@ -1,34 +1,39 @@
-import { resolve } from 'path';
+import { resolve, extname } from 'path';
 import { existsSync, readFileSync } from 'fs';
 import _ from 'lodash';
+import parser from './parsers.js';
 
-const getFilePath = (filepath) => {
-  if (existsSync(filepath)) {
-    return filepath;
+const getFilePath = (path) => {
+  if (existsSync(path)) {
+    return path;
   }
 
-  const absolutePath = resolve(process.cwd(), filepath);
+  const absolutePath = resolve(process.cwd(), path);
 
   return existsSync(absolutePath);
 };
 
-const genDiff = (filepath1, filepath2) => {
-  const existFilePath1 = getFilePath(filepath1);
-  const existFilePath2 = getFilePath(filepath2);
+const getFileData = (path) => {
+  const data = readFileSync(path);
+  const ext = extname(path);
 
-  if (!existFilePath1) {
-    return `incorrect ${filepath1}`;
+  return parser(data, ext);
+}
+
+const genDiff = (path1, path2) => {
+  const existPath1 = getFilePath(path1);
+  const existPath2 = getFilePath(path2);
+
+  if (!existPath1) {
+    return `incorrect ${path1}`;
   }
 
-  if (!existFilePath2) {
-    return `incorrect ${filepath2}`;
+  if (!existPath2) {
+    return `incorrect ${path2}`;
   }
 
-  const file1 = readFileSync(filepath1);
-  const file2 = readFileSync(filepath2);
-
-  const data1 = JSON.parse(file1.toString());
-  const data2 = JSON.parse(file2.toString());
+  const data1 = getFileData(path1);
+  const data2 = getFileData(path2);
 
   const keys = _.sortBy(_.uniq([...Object.keys(data1), ...Object.keys(data2)]));
 

@@ -23,6 +23,20 @@ test('diffJSON', () => {
 }`);
 });
 
+test('diffYAML', () => {
+  const file1 = getFixturePath('file1.yml');
+  const file2 = getFixturePath('file2.yml');
+
+  expect(genDiff(file1, file2)).toEqual(`{
+  - follow: false
+    host: hexlet.io
+  - proxy: 123.234.53.22
+  - timeout: 50
+  + timeout: 20
+  + verbose: true 
+}`);
+});
+
 test('incorrect file1 path', () => {
   const file1 = getFixturePath('file3.json');
   const file2 = getFixturePath('file2.json');
