@@ -2,20 +2,12 @@ import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import { expect, test } from '@jest/globals';
 
-import { getFileData, getFilePath } from '../src/file.js';
+import { getFileData } from '../src/file.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
-
-test('getFilePath', () => {
-  const file1 = getFixturePath('file1.json');
-  const file2 = getFixturePath('file3.json');
-
-  expect(getFilePath(file1)).toEqual('/Users/artemmalafeev/Учеба/Hexlet Frontend/projects/frontend-project-lvl2/__fixtures__/file1.json');
-  expect(getFilePath(file2)).toBeFalsy();
-});
 
 test('getFileData', () => {
   const file1 = getFixturePath('file1.json');
