@@ -1,12 +1,14 @@
 import yaml from 'js-yaml';
+import _ from 'lodash';
 
+const parsers = {
+  yaml: (data) => yaml.load(data),
+  yml: (data) => yaml.load(data),
+  json: (data) => JSON.parse(data),
+};
 
-export default (data, fileExt) => {
-  if (fileExt === '.json') {
-    return JSON.parse(data.toString());
-  }
+export default (data, ext) => {
+  const isParser = _.has(parsers, ext);
 
-  if (fileExt === '.yml' || fileExt === '.yaml') {
-    return yaml.load(data);
-  }
+  return isParser ? parsers[ext](data) : isParser;
 };

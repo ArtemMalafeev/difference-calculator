@@ -38,17 +38,37 @@ test('diffYAML', () => {
 });
 
 test('incorrect file1 path', () => {
-  const file1 = getFixturePath('file3.json');
-  const file2 = getFixturePath('file2.json');
+  const path1 = getFixturePath('file3.json');
+  const path2 = getFixturePath('file2.json');
 
-  expect(genDiff(file1, file2))
-    .toEqual(`incorrect ${file1}`);
+  expect(() => {
+    genDiff(path1, path2);
+  }).toThrowError(`Path ${path1} not found!`);
 });
 
 test('incorrect file2 path', () => {
-  const file1 = getFixturePath('file1.json');
-  const file2 = getFixturePath('file4.json');
+  const path1 = getFixturePath('file1.json');
+  const path2 = getFixturePath('file4.json');
 
-  expect(genDiff(file1, file2))
-    .toEqual(`incorrect ${file2}`);
+  expect(() => {
+    genDiff(path1, path2);
+  }).toThrowError(`Path ${path2} not found!`);
+});
+
+test('incorrect file1 ext', () => {
+  const path1 = getFixturePath('file3.txt');
+  const path2 = getFixturePath('file2.json');
+
+  expect(() => {
+    genDiff(path1, path2);
+  }).toThrowError('File extension "txt" not found!');
+});
+
+test('incorrect file2 ext', () => {
+  const path1 = getFixturePath('file1.json');
+  const path2 = getFixturePath('file3.txt');
+
+  expect(() => {
+    genDiff(path1, path2);
+  }).toThrowError('File extension "txt" not found!');
 });

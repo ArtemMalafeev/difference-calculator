@@ -1,45 +1,40 @@
-import { resolve, extname } from 'path';
-import { existsSync, readFileSync } from 'fs';
 import _ from 'lodash';
 import parser from './parsers.js';
-
-const getFilePath = (path) => {
-  if (existsSync(path)) {
-    return path;
-  }
-
-  const absolutePath = resolve(process.cwd(), path);
-
-  return existsSync(absolutePath);
-};
-
-const getFileData = (path) => {
-  const data = readFileSync(path);
-  const ext = extname(path);
-
-  return parser(data, ext);
-}
+import { getFilePath, getFileData } from './file.js';
 
 const genDiff = (path1, path2) => {
   const existPath1 = getFilePath(path1);
-  const existPath2 = getFilePath(path2);
 
   if (!existPath1) {
-    return `incorrect ${path1}`;
+    throw new Error(`Path ${path1} not found!`);
   }
+
+  const existPath2 = getFilePath(path2);
 
   if (!existPath2) {
-    return `incorrect ${path2}`;
+    throw new Error(`Path ${path2} not found!`);
   }
 
-  const data1 = getFileData(path1);
-  const data2 = getFileData(path2);
+  const [content1, ext1] = getFileData(path1);
+  const [content2, ext2] = getFileData(path2);
 
-  const keys = _.sortBy(_.uniq([...Object.keys(data1), ...Object.keys(data2)]));
+  const parserData1 = parser(content1, ext1);
+
+  if (!parserData1) {
+    throw new Error(`File extension "${ext1}" not found!`);
+  }
+
+  const parserData2 = parser(content2, ext2);
+
+  if (!parserData2) {
+    throw new Error(`File extension "${ext2}" not found!`);
+  }
+
+  const keys = _.sortBy(_.uniq([...Object.keys(parserData1), ...Object.keys(parserData2)]));
 
   const diff = keys.reduce((acc, key) => {
-    const value1 = _.get(data1, key);
-    const value2 = _.get(data2, key);
+    const value1 = _.get(parserData1, key);
+    const value2 = _.get(parserData2, key);
 
     if (value1 === value2) {
       return [...acc, [`  ${key}`, value1]];
