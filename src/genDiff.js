@@ -1,7 +1,7 @@
 import parser from './parsers.js';
 import { getFileData, getFilePath } from './file.js';
 import { buildAST } from './ast.js';
-import { makeTree } from "./stylish.js";
+import makeTree from "./stylish.js";
 
 const genDiff = (path1, path2) => {
   const existPath1 = getFilePath(path1);
