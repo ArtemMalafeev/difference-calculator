@@ -1,14 +1,11 @@
-import _ from "lodash";
+import _ from 'lodash';
 
-const initialNode = (key, value, status) => {
-  return {  key, value, status };
-}
+const initialNode = (key, value, status) => ({ key, value, status });
 
-export const buildAST = (tree1, tree2) => {
+const buildAST = (tree1, tree2) => {
   const keys = _.sortBy(_.uniq([...Object.keys(tree1), ...Object.keys(tree2)]));
 
   return keys.map((key) => {
-
     if (!_.has(tree1, key)) {
       return initialNode(key, _.get(tree2, key), 'added');
     }
@@ -30,4 +27,6 @@ export const buildAST = (tree1, tree2) => {
 
     return initialNode(key, [value1, value2], 'changed');
   });
-}
+};
+
+export default buildAST;
