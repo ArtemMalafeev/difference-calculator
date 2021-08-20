@@ -14,32 +14,38 @@ const drawNode = (value, depth) => {
   return value;
 };
 
-const drawTree = (ast, depth = 0) => {
-  const tree = ast.map((node) => {
-    const { key, value } = node;
+const drawTree = (ast, format, depth = 0) => {
 
-    if (node.status === 'added') {
-      return `${makeIndent(depth, '+')}${key}: ${drawNode(value, depth)}`;
-    }
+  if (format === 'stylish') {
+    const tree = ast.map((node) => {
+      const {key, value} = node;
 
-    if (node.status === 'removed') {
-      return `${makeIndent(depth, '-')}${key}: ${drawNode(value, depth)}`;
-    }
+      if (node.status === 'added') {
+        return `${makeIndent(depth, '+')}${key}: ${drawNode(value, depth)}`;
+      }
 
-    if (node.status === 'changed') {
-      return `${makeIndent(depth, '-')}${key}: ${drawNode(value[0], depth)}
+      if (node.status === 'removed') {
+        return `${makeIndent(depth, '-')}${key}: ${drawNode(value, depth)}`;
+      }
+
+      if (node.status === 'changed') {
+        return `${makeIndent(depth, '-')}${key}: ${drawNode(value[0], depth)}
 ${makeIndent(depth, '+')}${key}: ${drawNode(value[1], depth)}`;
-    }
+      }
 
-    if (node.status === 'unchanged') {
-      return `${makeIndent(depth)}${key}: ${drawNode(value, depth)}`;
-    }
+      if (node.status === 'unchanged') {
+        return `${makeIndent(depth)}${key}: ${drawNode(value, depth)}`;
+      }
 
-    return `${makeIndent(depth)}${key}: {\n${drawTree(value,
-      depth + 1)}\n${makeIndent(depth)}}`;
-  });
+      return `${makeIndent(depth)}${key}: {\n${drawTree(value, format,
+          depth + 1)}\n${makeIndent(depth)}}`;
+    });
 
-  return tree.join('\n');
+    return tree.join('\n');
+  } else {
+    return `format ${format} not fount!`;
+  }
 };
 
-export default (ast) => `{\n${drawTree(ast)}\n}`;
+
+export default (ast, format) => `{\n${drawTree(ast,format)}\n}`;

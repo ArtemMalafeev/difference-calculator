@@ -3,7 +3,7 @@ import { getFileData, getFilePath } from './file.js';
 import buildAST from './ast.js';
 import makeTree from './stylish.js';
 
-const genDiff = (path1, path2) => {
+const genDiff = (path1, path2, format='stylish') => {
   const existPath1 = getFilePath(path1);
 
   if (!existPath1) {
@@ -33,7 +33,7 @@ const genDiff = (path1, path2) => {
 
   const ast = buildAST(parserData1, parserData2);
 
-  return makeTree(ast);
+  return makeTree(ast, format);
 };
 
 export default genDiff;
