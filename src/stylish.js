@@ -42,11 +42,10 @@ ${makeIndent(depth, '+')}${key}: ${drawNode(value[1], depth)}`;
   return tree.join('\n');
 };
 
-
 export default (ast, format) => {
   if (format === 'stylish') {
     return `{\n${drawTree(ast)}\n}`;
   }
 
   return `format ${format} not found!`;
-}
+};
