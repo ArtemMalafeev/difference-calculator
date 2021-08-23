@@ -1,8 +1,9 @@
-import _ from 'lodash';
 import parser from './parsers.js';
-import { getFilePath, getFileData } from './file.js';
+import { getFileData, getFilePath } from './file.js';
+import buildAST from './ast.js';
+import makeTree from './stylish.js';
 
-const genDiff = (path1, path2) => {
+const genDiff = (path1, path2, format = 'stylish') => {
   const existPath1 = getFilePath(path1);
 
   if (!existPath1) {
@@ -30,26 +31,9 @@ const genDiff = (path1, path2) => {
     throw new Error(`File extension "${ext2}" not found!`);
   }
 
-  const keys = _.sortBy(_.uniq([...Object.keys(parserData1), ...Object.keys(parserData2)]));
+  const ast = buildAST(parserData1, parserData2);
 
-  const diff = keys.reduce((acc, key) => {
-    const value1 = _.get(parserData1, key);
-    const value2 = _.get(parserData2, key);
-
-    if (value1 === value2) {
-      return [...acc, [`  ${key}`, value1]];
-    }
-
-    return [
-      ...acc,
-      [`- ${key}`, value1],
-      [`+ ${key}`, value2],
-    ];
-  }, [])
-    .filter(([, value]) => value !== undefined)
-    .map(([key, value]) => `  ${key}: ${value}`).join('\n');
-
-  return `{\n${diff} \n}`;
+  return makeTree(ast, format);
 };
 
 export default genDiff;
