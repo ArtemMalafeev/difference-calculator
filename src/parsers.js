@@ -8,7 +8,9 @@ const parsers = {
 };
 
 export default (data, ext) => {
-  const isParser = _.has(parsers, ext);
+  if (!_.has(parsers, ext)) {
+    throw new Error(`Ext '${ext}' not found!`);
+  }
 
-  return isParser ? parsers[ext](data) : isParser;
+  return _.get(parsers, ext)(data);
 };

@@ -8,7 +8,11 @@ export const getFilePath = (path) => {
 
   const absolutePath = resolve(process.cwd(), path);
 
-  return existsSync(absolutePath);
+  if (!existsSync(absolutePath)) {
+    throw new Error(`Path '${path}' not found!`);
+  }
+
+  return absolutePath;
 };
 
 export const getFileData = (path) => {
