@@ -13,7 +13,7 @@ const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', 
 const resultStylish = fs.readFileSync(getFixturePath('stylish-result.txt')).toString();
 const resultPlain = fs.readFileSync(getFixturePath('plain-result.txt')).toString();
 
-test('genStylish', () => {
+test('difStylish', () => {
   const file1 = getFixturePath('file1.json');
   const file2 = getFixturePath('file2.json');
 
