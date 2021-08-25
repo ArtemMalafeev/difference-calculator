@@ -50,22 +50,26 @@ const render = (depth, key, value, status) => {
   return renders[status]();
 };
 
-const build = (ast, depth = 0) => {
-  const result = ast
-    .map((node) => {
-      const { key, value, status } = node;
+const build = (astTree) => {
+  const iter = (innerAst, depth) => {
+    const result = innerAst
+      .map((node) => {
+        const { key, value, status } = node;
 
-      if (status === 'object') {
-        const element = build(value, depth + 1);
-        const indent = makeIndent(depth);
+        if (status === 'object') {
+          const element = iter(value, depth + 1);
+          const indent = makeIndent(depth);
 
-        return `${indent}${key}: {\n${element}\n${indent}}`;
-      }
+          return `${indent}${key}: {\n${element}\n${indent}}`;
+        }
 
-      return render(depth, key, value, status);
-    });
+        return render(depth, key, value, status);
+      });
 
-  return result.join('\n');
+    return result.join('\n');
+  };
+
+  return iter(astTree, 0);
 };
 
-export default (ast) => `{\n${build(ast)}\n}`;
+export default (astTree) => `{\n${build(astTree)}\n}`;

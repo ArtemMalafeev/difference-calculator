@@ -29,21 +29,25 @@ const render = (path, value, status) => {
   return renders[status]();
 };
 
-const build = (ast, path = []) => {
-  const result = ast
-    .map((node) => {
-      const { key, value, status } = node;
-      const currentPath = [...path, key];
+const build = (astTree) => {
+  const iter = (innerAst, path) => {
+    const result = innerAst
+      .map((node) => {
+        const { key, value, status } = node;
+        const currentPath = [...path, key];
 
-      if (status === 'object') {
-        return build(value, currentPath);
-      }
+        if (status === 'object') {
+          return iter(value, currentPath);
+        }
 
-      return render(currentPath.join('.'), value, status);
-    })
-    .filter((line) => line !== '');
+        return render(currentPath.join('.'), value, status);
+      })
+      .filter((line) => line !== '');
 
-  return result.join('\n');
+    return result.join('\n');
+  };
+
+  return iter(astTree, []);
 };
 
-export default (ast) => build(ast);
+export default (astTree) => build(astTree);

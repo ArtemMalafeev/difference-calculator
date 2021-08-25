@@ -1,23 +1,23 @@
 import { existsSync, readFileSync } from 'fs';
 import { extname, resolve } from 'path';
 
-export const getFilePath = (path) => {
-  if (existsSync(path)) {
-    return path;
+export const getFilePath = (filePath) => {
+  if (existsSync(filePath)) {
+    return filePath;
   }
 
-  const absolutePath = resolve(process.cwd(), path);
+  const absolutePath = resolve(process.cwd(), filePath);
 
   if (!existsSync(absolutePath)) {
-    throw new Error(`Path '${path}' not found!`);
+    throw new Error(`Path '${filePath}' not found!`);
   }
 
   return absolutePath;
 };
 
-export const getFileData = (path) => {
-  const data = readFileSync(path).toString();
-  const ext = extname(path).slice(1);
+export const getFileData = (filePath) => {
+  const data = readFileSync(filePath).toString();
+  const ext = extname(filePath).slice(1);
 
   return [data, ext];
 };
