@@ -12,5 +12,5 @@ export default (data, ext) => {
     throw new Error(`Ext '${ext}' not found!`);
   }
 
-  return _.get(parsers, ext)(data);
+  return parsers[ext](data);
 };

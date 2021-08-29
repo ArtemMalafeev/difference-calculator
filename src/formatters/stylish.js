@@ -2,13 +2,13 @@ import _ from 'lodash';
 
 const makeIndent = (depth, symbol = ' ') => `${'    '.repeat(depth)}  ${symbol} `;
 
-const normalize = (value, depth) => {
+const stringify = (value, depth) => {
   if (_.isObject(value)) {
     const keys = Object.keys(value);
     const indent = makeIndent(depth);
 
     const node = keys
-      .map((key) => `${indent}    ${key}: ${normalize(value[key], depth + 1)}`)
+      .map((key) => `${indent}    ${key}: ${stringify(value[key], depth + 1)}`)
       .join('\n');
 
     return `{\n${node}\n${indent}}`;
@@ -17,22 +17,22 @@ const normalize = (value, depth) => {
   return value;
 };
 
-const render = (depth, key, value, status) => {
+const format = (depth, key, value, status) => {
   const addedType = () => {
     const indent = makeIndent(depth, '+');
-    return `${indent}${key}: ${normalize(value, depth)}`;
+    return `${indent}${key}: ${stringify(value, depth)}`;
   };
 
   const removedType = () => {
     const indent = makeIndent(depth, '-');
-    return `${indent}${key}: ${normalize(value, depth)}`;
+    return `${indent}${key}: ${stringify(value, depth)}`;
   };
 
   const changedType = () => {
     const [value1, value2] = value;
     const removedIndent = makeIndent(depth, '-');
     const addedIndent = makeIndent(depth, '+');
-    return `${removedIndent}${key}: ${normalize(value1, depth)}\n${addedIndent}${key}: ${normalize(value2, depth)}`;
+    return `${removedIndent}${key}: ${stringify(value1, depth)}\n${addedIndent}${key}: ${stringify(value2, depth)}`;
   };
 
   const unchangedType = () => {
@@ -54,16 +54,14 @@ const build = (astTree) => {
   const iter = (innerAst, depth) => {
     const result = innerAst
       .map((node) => {
-        const { key, value, status } = node;
-
-        if (status === 'object') {
-          const element = iter(value, depth + 1);
+        if (node.type === 'nested') {
+          const element = iter(node.children, depth + 1);
           const indent = makeIndent(depth);
 
-          return `${indent}${key}: {\n${element}\n${indent}}`;
+          return `${indent}${node.key}: {\n${element}\n${indent}}`;
         }
 
-        return render(depth, key, value, status);
+        return format(depth, node.key, node.value, node.type);
       });
 
     return result.join('\n');

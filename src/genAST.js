@@ -1,32 +1,30 @@
 import _ from 'lodash';
 
-const initialNode = (key, value, status) => ({ key, value, status });
-
-const buildAST = (tree1, tree2) => {
-  const keys = _.sortBy(_.uniq([...Object.keys(tree1), ...Object.keys(tree2)]));
+const buildAST = (firstObject, secondObject) => {
+  const keys = _.sortBy(_.union(_.keys(firstObject), _.keys(secondObject)));
 
   return keys
     .map((key) => {
-      if (!_.has(tree1, key)) {
-        return initialNode(key, _.get(tree2, key), 'added');
+      if (!_.has(firstObject, key)) {
+        return { key, value: secondObject[key], type: 'added' };
       }
 
-      if (!_.has(tree2, key)) {
-        return initialNode(key, _.get(tree1, key), 'removed');
+      if (!_.has(secondObject, key)) {
+        return { key, value: firstObject[key], type: 'removed' };
       }
 
-      const value1 = _.get(tree1, key);
-      const value2 = _.get(tree2, key);
+      const value1 = firstObject[key];
+      const value2 = secondObject[key];
 
-      if (_.isObject(value1) && _.isObject(value2)) {
-        return initialNode(key, buildAST(value1, value2), 'object');
+      if (_.isPlainObject(value1) && _.isPlainObject(value2)) {
+        return { key, children: buildAST(value1, value2), type: 'nested' };
       }
 
-      if (value1 === value2) {
-        return initialNode(key, value1, 'unchanged');
+      if (_.isEqual(value1, value2)) {
+        return { key, value: value1, type: 'unchanged' };
       }
 
-      return initialNode(key, [value1, value2], 'changed');
+      return { key, value: [value1, value2], type: 'changed' };
     });
 };
 

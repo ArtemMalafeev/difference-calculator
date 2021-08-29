@@ -2,10 +2,6 @@ import { existsSync, readFileSync } from 'fs';
 import { extname, resolve } from 'path';
 
 export const getFilePath = (filePath) => {
-  if (existsSync(filePath)) {
-    return filePath;
-  }
-
   const absolutePath = resolve(process.cwd(), filePath);
 
   if (!existsSync(absolutePath)) {
@@ -15,9 +11,10 @@ export const getFilePath = (filePath) => {
   return absolutePath;
 };
 
-export const getFileData = (filePath) => {
-  const data = readFileSync(filePath).toString();
-  const ext = extname(filePath).slice(1);
+export const getFileContent = (filePath) => readFileSync(filePath).toString();
 
-  return [data, ext];
+export const getFileExt = (filePath) => {
+  const ext = extname(filePath);
+
+  return ext.slice(1);
 };

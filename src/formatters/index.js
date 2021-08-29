@@ -15,5 +15,5 @@ export default (ast, format) => {
     throw new Error(`Format '${format}' not found!`);
   }
 
-  return _.get(formatters, format)(ast);
+  return formatters[format](ast);
 };
