@@ -1,43 +1,42 @@
 import _ from 'lodash';
 
-const makeIndent = (depth, symbol = ' ') => `${'    '.repeat(depth)}  ${symbol} `;
+const indentSymbol = ' ';
+const indentSize = 2;
+const baseIndentSize = 2;
+
+const makeIndent = (depth) => `${indentSymbol.repeat(depth)}`;
 
 const stringify = (data, depth) => {
   if (_.isPlainObject(data)) {
-    const indent = makeIndent(depth);
+    const currentIndent = makeIndent(depth * indentSize + baseIndentSize);
+    const closeIndent = makeIndent(depth * indentSize - baseIndentSize);
+
     const node = Object
       .entries(data)
-      .map(([key, value]) => `${indent}    ${key}: ${stringify(value, depth + 1)}`)
-      .join('\n');
+      .map(([key, value]) => `${currentIndent}${key}: ${stringify(value, depth + 2)}`);
 
-    return `{\n${node}\n${indent}}`;
+    return ['{', ...node, `${closeIndent}}`]
+      .join('\n');
   }
 
   return data;
 };
 
-const format = (depth, { key, value, type }) => {
-  const addedType = () => {
-    const indent = makeIndent(depth, '+');
-    return `${indent}${key}: ${stringify(value, depth)}`;
-  };
+const format = (node, depth) => {
+  const {
+    key, value, type, oldValue, newValue,
+  } = node;
+  const currentIndent = makeIndent(depth * indentSize);
 
-  const removedType = () => {
-    const indent = makeIndent(depth, '-');
-    return `${indent}${key}: ${stringify(value, depth)}`;
-  };
-
-  const changedType = () => {
-    const [value1, value2] = value;
-    const removedIndent = makeIndent(depth, '-');
-    const addedIndent = makeIndent(depth, '+');
-    return `${removedIndent}${key}: ${stringify(value1, depth)}\n${addedIndent}${key}: ${stringify(value2, depth)}`;
-  };
-
-  const unchangedType = () => {
-    const indent = makeIndent(depth);
-    return `${indent}${key}: ${value}`;
-  };
+  const addedType = () => `${currentIndent}+ ${key}: ${stringify(value, depth + 2)}`;
+  const removedType = () => `${currentIndent}- ${key}: ${stringify(value, depth + 2)}`;
+  const changedType = () => ([
+    `${currentIndent}- ${key}: ${stringify(oldValue, depth + 2)}`,
+    `${currentIndent}+ ${key}: ${stringify(newValue, depth + 2)}`,
+  ]
+    .join('\n')
+  );
+  const unchangedType = () => `${currentIndent}  ${key}: ${value}`;
 
   const renders = {
     added: addedType,
@@ -54,23 +53,28 @@ const format = (depth, { key, value, type }) => {
 };
 
 const build = (astTree) => {
-  const iter = (innerAst, depth) => {
+  const iter = (innerAst, depth = 1) => {
     const result = innerAst
       .map((node) => {
-        if (node.type === 'nested') {
-          const element = iter(node.children, depth + 1);
-          const indent = makeIndent(depth);
+        const { key, children, type } = node;
 
-          return `${indent}${node.key}: {\n${element}\n${indent}}`;
+        if (type === 'nested') {
+          const inner = iter(children, depth + 2);
+          const currentIndent = makeIndent(depth * indentSize + baseIndentSize);
+
+          return `${currentIndent}${key}: ${inner}`;
         }
 
-        return format(depth, node);
+        return format(node, depth);
       });
 
-    return result.join('\n');
+    const closeIndent = makeIndent(depth * indentSize - baseIndentSize);
+
+    return ['{', ...result, `${closeIndent}}`]
+      .join('\n');
   };
 
-  return iter(astTree, 0);
+  return iter(astTree);
 };
 
-export default (astTree) => ['{', build(astTree), '}'].join('\n');
+export default (astTree) => build(astTree);

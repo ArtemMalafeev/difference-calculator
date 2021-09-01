@@ -12,22 +12,18 @@ const stringify = (data) => {
   return data;
 };
 
-const format = (path, { value, type }) => {
+const format = (path, node) => {
+  const {
+    value, type, oldValue, newValue,
+  } = node;
   const addedType = () => `Property '${path}' was added with value: ${stringify(value)}`;
   const removedType = () => `Property '${path}' was removed`;
-  const changedType = () => {
-    const [value1, value2] = value;
-    const removedValue = stringify(value1);
-    const addedValue = stringify(value2);
-    return `Property '${path}' was updated. From ${removedValue} to ${addedValue}`;
-  };
-  const unchangedType = () => '';
+  const changedType = () => `Property '${path}' was updated. From ${stringify(oldValue)} to ${stringify(newValue)}`;
 
   const renders = {
     added: addedType,
     removed: removedType,
     changed: changedType,
-    unchanged: unchangedType,
   };
 
   if (!_.has(renders, type)) {
