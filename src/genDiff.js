@@ -1,6 +1,6 @@
 import parser from './parsers.js';
 import { getFileContent, getFilePath, getFileExt } from './file-utils.js';
-import buildAST from './genAST.js';
+import buildAST from './buildAST.js';
 import genToFormat from './formatters/index.js';
 
 const getFileData = (filePath) => {

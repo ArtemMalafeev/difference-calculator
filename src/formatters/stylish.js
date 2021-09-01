@@ -2,22 +2,21 @@ import _ from 'lodash';
 
 const makeIndent = (depth, symbol = ' ') => `${'    '.repeat(depth)}  ${symbol} `;
 
-const stringify = (value, depth) => {
-  if (_.isObject(value)) {
-    const keys = Object.keys(value);
+const stringify = (data, depth) => {
+  if (_.isPlainObject(data)) {
     const indent = makeIndent(depth);
-
-    const node = keys
-      .map((key) => `${indent}    ${key}: ${stringify(value[key], depth + 1)}`)
+    const node = Object
+      .entries(data)
+      .map(([key, value]) => `${indent}    ${key}: ${stringify(value, depth + 1)}`)
       .join('\n');
 
     return `{\n${node}\n${indent}}`;
   }
 
-  return value;
+  return data;
 };
 
-const format = (depth, key, value, status) => {
+const format = (depth, { key, value, type }) => {
   const addedType = () => {
     const indent = makeIndent(depth, '+');
     return `${indent}${key}: ${stringify(value, depth)}`;
@@ -47,7 +46,11 @@ const format = (depth, key, value, status) => {
     unchanged: unchangedType,
   };
 
-  return renders[status]();
+  if (!_.has(renders, type)) {
+    throw new Error(`Type '${type}' is undefined`);
+  }
+
+  return renders[type]();
 };
 
 const build = (astTree) => {
@@ -61,7 +64,7 @@ const build = (astTree) => {
           return `${indent}${node.key}: {\n${element}\n${indent}}`;
         }
 
-        return format(depth, node.key, node.value, node.type);
+        return format(depth, node);
       });
 
     return result.join('\n');
@@ -70,4 +73,4 @@ const build = (astTree) => {
   return iter(astTree, 0);
 };
 
-export default (astTree) => `{\n${build(astTree)}\n}`;
+export default (astTree) => ['{', build(astTree), '}'].join('\n');
