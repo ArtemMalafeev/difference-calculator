@@ -4,7 +4,7 @@ ____
 
 ## Description
 
-###Difference calculator
+Difference calculator
 
 Allows you to find the difference between two files with extensions: json, yml, yaml.
 
